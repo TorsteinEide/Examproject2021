@@ -1,40 +1,39 @@
-# 1.
+# 1
 SELECT COUNT(*)
-FROM Books
-WHERE title = 'A' AJD publisher = 'B' AND branchID IN (
+FROM books
+WHERE title = 'A' AND publisher = 'B' AND branchID IN (
     SELECT branchID
-    FROM Branches
+    FROM branches
     WHERE address = 'C'
-)
+);
 
-# 2.
-SELECT COUNT(DISTINCT branchID)
+# 2
+SELECT COUNT(branchID)
 FROM Books
 WHERE title = 'A'
+GROUP BY branchID;
 
+# 3
+SELECT borrowers.firstName, borrowers.lastName, branches.name
+FROM books
+INNER JOIN lentBooks ON books.bookID = lentBooks.bookID
+INNER JOIN borrowers ON lentBooks.borrowerID = borrowers.borrowerID
+INNER JOIN branches ON books.branchID = branches.branchID
+WHERE books.title = 'A';
 
-# 3.
-SELECT Borrowers.firstName, Borrowers.lastName, Branches.name
-FROM Books
-INNER JOIN LentBooks ON Books.bookID = LentBooks.bookID
-INNER JOIN Borrowers ON LentBooks.borrowerID = Borrowers.borrowerID
-INNER JOIN Branches ON Books.branchID = Branches.branchID
-WHERE Books.title = 'A'
+# 4
+SELECT books.title, borrowers.firstName, borrowers.lastName, borrowers.address
+FROM lentBooks
+INNER JOIN books ON lentBooks.bookID = books.bookID
+INNER JOIN borrowers ON lentBooks.borrowerID = borrowers.borrowerID
+WHERE lentBooks.dueDate = getToday() AND branchID = 'A';
 
-# 4.
-SELECT Books.title, Borrowers.firstName, Borrowers.lastName, Borrowers.address
-FROM LentBooks
-INNER JOIN Books ON LentBooks.bookID = Books.bookID
-INNER JOIN Borrowers ON LentBooks.borrowerID = Borrowers.borrowerID
-WHERE LentBooks.dueDate = getToday() AND branchID = 'A'
-
-
-
-# 5.
-SELECT COUNT(DISTINCT Branches.branchID), Branches.name
-FROM Branches
-INNER JOIN Books ON Branches.branchID = Books.branchID
+# 5
+SELECT branches.name, COUNT(bookID)
+FROM branches
+INNER JOIN books ON branches.branchID = books.branchID
 WHERE bookID IN (
-    SELECT bookID
-    FROM LentBooks
-)
+    SELECT lentBooks.bookID
+    FROM lentBooks
+    )
+GROUP BY branches.branchID;
